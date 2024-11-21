@@ -3,8 +3,9 @@ pipeline {
         TOKEN = credentials('SURGE_TOKEN')
       }
     agent {
-        docker { image 'josedom24/debian-npm'
-        args '-u root:root'
+        docker { 
+            image 'josedom24/debian-npm'
+            args '-u root:root'
         }
     }
     stages {
@@ -14,10 +15,27 @@ pipeline {
             }
         }
         
-        stage('Install surge')
-        {
+        stage('Install surge') {
             steps {
                 sh 'npm install -g surge'
+            }
+        }
+        
+        stage('Install Pip') {
+            steps {
+                sh 'apt update -y && apt install pip default-jre -y'
+            }
+        }
+       
+        stage('Install Dependencies') {
+            steps {
+                sh 'pip install html5validator '
+            }
+        }
+       
+        stage('Test HTML') {
+            steps {
+                sh 'html5validator --root _build/'
             }
         }
         stage('Deploy')
